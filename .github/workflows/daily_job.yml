@@ -41,6 +41,7 @@ jobs:
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          echo "SUMMARY_CONTENT"
 
       - name: Send Mail
         if: always()
