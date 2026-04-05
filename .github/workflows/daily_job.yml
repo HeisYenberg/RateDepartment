@@ -43,7 +43,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Archive logs
-        run: zip logs.zip daily_log.txt
+        run: zip logs.zip RateDepartment/daily_log.txt
 
       - name: Send Mail
         if: always()
@@ -62,4 +62,4 @@ jobs:
             ${{ env.SUMMARY_CONTENT }}
             
             Детальный лог во вложении.
-          attachments: RateDepartment/logs.zip
+          attachments: logs.zip
