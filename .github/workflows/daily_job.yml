@@ -26,14 +26,14 @@ jobs:
 
       - name: Run an application
         env:
-          AppSettings__Site: ${{ secrets.TARGET_SITE }}
-          AppSettings__Organisation__Name: ${{ secrets.ORG_NAME }}
-          AppSettings__Organisation__Rating: ${{ secrets.ORG_RATING }}
-          AppSettings__Organisation__Departments: ${{ secrets.ORG_DEPARTMENTS }}
-          AppSettings__Tries__Min: ${{ vars.TRIES_MIN }}
-          AppSettings__Tries__Max: ${{ vars.TRIES_MAX }}
-          AppSettings__Timeouts__Min: ${{ vars.TIMEOUTS_MIN }}
-          AppSettings__Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
+          Site: ${{ secrets.TARGET_SITE }}
+          Organisation__Name: ${{ secrets.ORG_NAME }}
+          Organisation__Rating: ${{ secrets.ORG_RATING }}
+          Organisation__Departments: ${{ secrets.ORG_DEPARTMENTS }}
+          Tries__Min: ${{ vars.TRIES_MIN }}
+          Tries__Max: ${{ vars.TRIES_MAX }}
+          Timeouts__Min: ${{ vars.TIMEOUTS_MIN }}
+          Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
 
         run: |
           dotnet build
