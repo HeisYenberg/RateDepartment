@@ -15,7 +15,7 @@ public class AppSettingsConfig
         public string Rating { get; set; }
         public List<string> DepartmentsList { get; set; } = [];
 
-        private string Departments
+        public string Departments
         {
             get => DepartmentsList.Join(",");
             set => DepartmentsList = value.Split(',')
