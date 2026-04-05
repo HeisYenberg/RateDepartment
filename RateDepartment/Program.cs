@@ -32,7 +32,8 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
     options.AddArgument("--disable-gpu");
     options.AddArgument("--window-size=1920,1080");
 
-    using var driver = new ChromeDriver(options);
+    Thread.Sleep(new Random().Next(1000, 5000));
+    using var driver = new ChromeDriver(ChromeDriverService.CreateDefaultService(), options, TimeSpan.FromMinutes(3));
     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
     driver.Manage().Window.Maximize();
     driver.Navigate().GoToUrl(settings.Site);
