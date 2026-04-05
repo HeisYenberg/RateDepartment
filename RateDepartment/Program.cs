@@ -19,6 +19,8 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
     .CreateLogger();
 
+Console.WriteLine($"DEBUG: Получено департаментов: {settings.Organisation.Departments}");
+Console.WriteLine($"DEBUG: Получено департаментов: {settings.Organisation.DepartmentsList.Count}");
 var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = settings.Organisation.DepartmentsList.Count };
 var random = new Random();
 var passedCount = settings.Organisation.DepartmentsList.ToDictionary(d => d, _ => 0);
