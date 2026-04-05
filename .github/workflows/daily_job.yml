@@ -43,6 +43,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Archive logs
+        if: always()
         run: zip logs.zip RateDepartment/daily_log.txt
 
       - name: Send Mail
