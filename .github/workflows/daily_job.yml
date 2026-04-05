@@ -37,9 +37,8 @@ jobs:
         run: |
           cd RateDepartment 
           dotnet build
-          
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
-          dotnet run >> $GITHUB_ENV
+          dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Send Mail
