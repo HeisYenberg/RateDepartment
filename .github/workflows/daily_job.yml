@@ -23,7 +23,7 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Run a application
+      - name: Run an application
         env:
           AppSettings__Site: ${{ secrets.TARGET_SITE }}
           AppSettings__Organisation__Name: ${{ secrets.ORG_NAME }}
@@ -37,7 +37,7 @@ jobs:
         run: |
           cd RateDepartment 
           dotnet build
-          ::debug::${{ secrets.ORG_DEPARTMENTS }}
+          echo "::debug::${{ secrets.ORG_DEPARTMENTS }}
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
