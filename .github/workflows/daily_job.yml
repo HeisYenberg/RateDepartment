@@ -36,12 +36,12 @@ jobs:
           AppSettings__Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
 
         run: |
-          cd RateDepartment 
+          cd RateDepartment/RateDepartment 
           dotnet build
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "SUMMARY_CONTENT"
+          echo "${{ env.SUMMARY_CONTENT }}"
 
       - name: Send Mail
         if: always()
@@ -60,4 +60,4 @@ jobs:
             ${{ env.SUMMARY_CONTENT }}
             
             Детальный лог во вложении.
-          attachments: daily_log.txt
+          attachments: RateDepartment/daily_log.txt
