@@ -4,10 +4,10 @@ namespace RateDepartment.Configs;
 
 public class AppSettingsConfig
 {
-    public string Site { get; set; } = "";
-    public OrganisationConfig Organisation { get; set; } = new();
-    public TriesConfig Tries { get; set; } = new();
-    public TimeoutsConfig Timeouts { get; set; } = new();
+    public string Site { get; set; }
+    public OrganisationConfig Organisation { get; set; }
+    public TriesConfig Tries { get; set; }
+    public TimeoutsConfig Timeouts { get; set; }
 
     public class OrganisationConfig
     {
@@ -27,13 +27,13 @@ public class AppSettingsConfig
 
     public class TriesConfig
     {
-        public int Min { get; set; } = 1;
-        public int Max { get; set; } = 1;
+        public int Min { get; set; }
+        public int Max { get; set; }
     }
 
     public class TimeoutsConfig
     {
-        public int Min { get; set; } = 1;
-        public int Max { get; set; } = 1;
+        public int Min { get; set; }
+        public int Max { get; set; }
     }
 }
