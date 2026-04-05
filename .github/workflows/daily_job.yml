@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
+  call-workflow:
+    uses: ./.github/workflows/reusable-script.yml
+    secrets: inherit
+
   build-and-run:
     runs-on: ubuntu-latest
 
@@ -29,14 +33,15 @@ jobs:
           AppSettings__Organisation__Name: ${{ secrets.ORG_NAME }}
           AppSettings__Organisation__Rating: ${{ secrets.ORG_RATING }}
           AppSettings__Organisation__Departments: ${{ secrets.ORG_DEPARTMENTS }}
-          AppSettings__Tries__Min: ${{ secrets.TRIES_MIN }}
-          AppSettings__Tries__Max: ${{ secrets.TRIES_MAX }}
-          AppSettings__Timeouts__Min: ${{ secrets.TIMEOUTS_MIN }}
-          AppSettings__Timeouts__Max: ${{ secrets.TIMEOUTS_MAX }}
+          AppSettings__Tries__Min: ${{ vars.TRIES_MIN }}
+          AppSettings__Tries__Max: ${{ vars.TRIES_MAX }}
+          AppSettings__Timeouts__Min: ${{ vars.TIMEOUTS_MIN }}
+          AppSettings__Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
 
         run: |
           cd RateDepartment 
           dotnet build
+          ::debug::${{ secrets.ORG_DEPARTMENTS }}
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
