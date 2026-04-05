@@ -35,6 +35,7 @@ jobs:
           AppSettings__Timeouts__Max: ${{ secrets.TIMEOUTS_MAX }}
 
         run: |
+          ls
           dotnet build
           
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
