@@ -26,7 +26,12 @@ var passedCount = settings.Organisation.DepartmentsList.ToDictionary(d => d, _ =
 Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, department =>
 {
     var options = new ChromeOptions();
-    options.AddArgument("headless");
+    options.AddArgument("--headless=new");
+    options.AddArgument("--no-sandbox");
+    options.AddArgument("--disable-dev-shm-usage");
+    options.AddArgument("--disable-gpu");
+    options.AddArgument("--window-size=1920,1080");
+
     using var driver = new ChromeDriver(options);
     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
     driver.Manage().Window.Maximize();
