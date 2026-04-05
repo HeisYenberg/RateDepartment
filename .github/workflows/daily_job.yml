@@ -36,7 +36,7 @@ jobs:
           AppSettings__Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
 
         run: |
-          cd RateDepartment/RateDepartment 
+          cd RateDepartment 
           dotnet build
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
