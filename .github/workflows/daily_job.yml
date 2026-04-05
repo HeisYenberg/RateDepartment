@@ -42,6 +42,9 @@ jobs:
           dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Archive logs
+        run: zip logs.zip daily_log.txt
+
       - name: Send Mail
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -51,12 +54,12 @@ jobs:
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "Отчет: Выставка оценок завершена"
+          subject: "Отчет: Прогон завершен"
           to: ${{ secrets.MAIL_TO }}
-          from: "GitHub Bot <${{ secrets.MAIL_USERNAME }}>"
+          from: "${{ secrets.MAIL_USERNAME }}"
           body: |
             Результаты выполнения:
             ${{ env.SUMMARY_CONTENT }}
             
             Детальный лог во вложении.
-          attachments: RateDepartment/daily_log.txt
+          attachments: RateDepartment/logs.zip
