@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-6'
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+
+      - name: Run a application
+        env:
+          AppSettings__Site: ${{ secrets.TARGET_SITE }}
+          AppSettings__Organisation__Name: ${{ secrets.ORG_NAME }}
+          AppSettings__Organisation__Rating: ${{ secrets.ORG_RATING }}
+          AppSettings__Organisation__Departments: ${{ secrets.ORG_DEPARTMENTS }}
+          AppSettings__Tries__Min: ${{ secrets.TRIES_MIN }}
+          AppSettings__Tries__Max: ${{ secrets.TRIES_MAX }}
+          AppSettings__Timeouts__Min: ${{ secrets.TIMEOUTS_MIN }}
+          AppSettings__Timeouts__Max: ${{ secrets.TIMEOUTS_MAX }}
+
+        run: |
+          dotnet build
+          
+          echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
+          dotnet run >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Send Mail
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.yandex.ru
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Отчет: Выставка оценок завершена"
+          to: ${{ secrets.MAIL_TO }}
+          from: "GitHub Bot <${{ secrets.MAIL_USERNAME }}>"
+          body: |
+            Результаты выполнения:
+            ${{ env.SUMMARY_CONTENT }}
+            
+            Детальный лог во вложении.
+          attachments: daily_log.txt
