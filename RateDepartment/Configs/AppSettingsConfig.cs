@@ -4,15 +4,15 @@ namespace RateDepartment.Configs;
 
 public class AppSettingsConfig
 {
-    public string Site { get; set; }
-    public OrganisationConfig Organisation { get; set; }
-    public TriesConfig Tries { get; set; }
-    public TimeoutsConfig Timeouts { get; set; }
+    public string Site { get; set; } = "";
+    public OrganisationConfig Organisation { get; set; } = new();
+    public TriesConfig Tries { get; set; } = new();
+    public TimeoutsConfig Timeouts { get; set; } = new();
 
     public class OrganisationConfig
     {
-        public string Name { get; set; }
-        public string Rating { get; set; }
+        public string Name { get; set; } = "";
+        public string Rating { get; set; } = "";
         public List<string> DepartmentsList { get; set; } = [];
 
         public string Departments

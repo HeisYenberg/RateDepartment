@@ -36,7 +36,6 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
     using var driver = new ChromeDriver(ChromeDriverService.CreateDefaultService(), options, TimeSpan.FromMinutes(3));
     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
     driver.Manage().Window.Maximize();
-    driver.Navigate().GoToUrl(settings.Site);
     var questionnairePage = new QuestionnairePage(driver);
 
     for (var i = 0; i < random.Next(settings.Tries.Min, settings.Tries.Max); i++)
@@ -45,6 +44,7 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
 
         try
         {
+            driver.Navigate().GoToUrl(settings.Site);
             questionnairePage.SelectOrganisation(settings.Organisation.Name)
                 .SelectDepartment(department)
                 .SelectStarRating(settings.Organisation.Rating)
@@ -62,12 +62,6 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
         }
     }
 });
-
-if (errorsList.Count > 0)
-{
-    Console.WriteLine("Во время прогона произошли следующие ошибки:");
-    Console.WriteLine(errorsList.Join(Environment.NewLine));
-}
 
 Console.WriteLine($"Скрипт завершился {(errorsList.Count == 0 ? "без ошибок" : $"c {errorsList.Count} ошибками")}");
 Console.WriteLine(settings.Organisation.DepartmentsList.Select(d => $"Отделу {d} проставлено {passedCount[d]} отзывов").Join(Environment.NewLine));
