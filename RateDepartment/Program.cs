@@ -54,11 +54,11 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
 
             Log.Information("Отделу {Department} оставлен отзыв 1 звезда", department);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             var error = $"Не удалось оставить отзыва отделению {department}";
             errorsList.Add(error);
-            Log.Error(error);
+            Log.Error(e, error);
         }
     }
 });

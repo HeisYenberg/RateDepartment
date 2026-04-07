@@ -2,7 +2,7 @@ name: CI
 
 on:
   schedule:
-    - cron: '37 3 * * 1-6'
+    - cron: '37 2 * * 1-6'
   workflow_dispatch:
 
 jobs:
@@ -38,8 +38,9 @@ jobs:
         run: |
           dotnet build
           cd RateDepartment
+          dotnet run --no-build 2>&1 | tee output.tmp
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV
-          dotnet run --no-build >> $GITHUB_ENV || echo "Ошибка при выполнении" >> $GITHUB_ENV
+          sed -n '/Скрипт завершился/,$p' output.tmp >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Archive logs
