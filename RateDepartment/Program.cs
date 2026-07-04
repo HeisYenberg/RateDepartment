@@ -71,13 +71,15 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
                 .ClickOk();
             passedCount[department]++;
 
-            Log.Information("Отделу {Department} оставлен отзыв 1 звезда", department);
+            Log.Information("Отделу {Department} оставлен отзыв {Rating} звезда", department, settings.Organisation.Rating);
         }
-        catch (WebDriverException)
+        catch (Exception ex) when(ex is WebDriverException or ObjectDisposedException)
         {
             SafeDriverQuit(driver);
             driver = GetDriver();
-            Log.Warning("Драйвер выкинул ошибку, произведена перезагрузка");
+            const string error = "Драйвер выкинул ошибку, произведена перезагрузка";
+            errorsList.Add(error);
+            Log.Warning(error);
         }
         catch (Exception e)
         {
