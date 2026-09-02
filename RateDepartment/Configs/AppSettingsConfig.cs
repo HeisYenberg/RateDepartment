@@ -18,10 +18,12 @@ public class AppSettingsConfig
         public string Departments
         {
             get => DepartmentsList.Join(",");
-            set => DepartmentsList = value.Split(',')
-                .Select(d => d.Trim())
-                .Where(d => !string.IsNullOrEmpty(d))
-                .ToList();
+            set => DepartmentsList =
+            [
+                .. value.Split(',')
+                    .Select(d => d.Trim())
+                    .Where(d => !string.IsNullOrEmpty(d))
+            ];
         }
     }
 

@@ -1,9 +1,9 @@
-﻿using RateDepartment.Configs;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Playwright;
+using OpenQA.Selenium;
+using RateDepartment.Configs;
 using RateDepartment.Extensions;
 using RateDepartment.PageObject;
-using Microsoft.Extensions.Configuration;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using Serilog;
 
 var errorsList = new List<string>();
@@ -20,51 +20,39 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
     .CreateLogger();
 
-var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = settings.Organisation.DepartmentsList.Count };
-var random = new Random();
+var parallelOptions = new ParallelOptions
+{
+    MaxDegreeOfParallelism = settings.Organisation.DepartmentsList.Count
+};
 var passedCount = settings.Organisation.DepartmentsList.ToDictionary(d => d, _ => 0);
 
-Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, department =>
+using var playwright = await Playwright.CreateAsync();
+await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
 {
-    ChromeDriver GetDriver()
+    Headless = false,
+    Args =
+    [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
+    ]
+});
+
+await Parallel.ForEachAsync(settings.Organisation.DepartmentsList, parallelOptions, async (department, cancellationToken) =>
+{
+    var context = await CreateContextAsync(browser);
+    var page = await context.NewPageAsync();
+    var questionnairePage = Task.FromResult(new QuestionnairePage(page));
+
+    for (var i = 0; i < Random.Shared.Next(settings.Tries.Min, settings.Tries.Max); i++)
     {
-        var options = new ChromeOptions();
-        options.AddArgument("--headless=new");
-        options.AddArgument("--no-sandbox");
-        options.AddArgument("--disable-dev-shm-usage");
-        options.AddArgument("--disable-gpu");
-        options.AddArgument("--window-size=1920,1080");
-
-        Thread.Sleep(new Random().Next(1000, 5000));
-        var d = new ChromeDriver(ChromeDriverService.CreateDefaultService(), options, TimeSpan.FromMinutes(3));
-        d.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
-        d.Manage().Window.Maximize();
-        return d;
-    }
-
-    void SafeDriverQuit(ChromeDriver driver)
-    {
-        try
-        {
-            driver.Quit();
-        }
-        catch
-        {
-            // ignored
-        }
-    }
-
-    var driver = GetDriver();
-    var questionnairePage = new QuestionnairePage(driver);
-
-    for (var i = 0; i < random.Next(settings.Tries.Min, settings.Tries.Max); i++)
-    {
-        Thread.Sleep(TimeSpan.FromMinutes(random.Next(settings.Timeouts.Min, settings.Timeouts.Max)));
+        await Task.Delay(TimeSpan.FromMinutes(Random.Shared.Next(settings.Timeouts.Min, settings.Timeouts.Max)), cancellationToken);
 
         try
         {
-            driver.Navigate().GoToUrl(settings.Site);
-            questionnairePage.SelectOrganisation(settings.Organisation.Name)
+            await page.GotoAsync(settings.Site);
+            await questionnairePage
+                .SelectOrganisation(settings.Organisation.Name)
                 .SelectDepartment(department)
                 .SelectStarRating(settings.Organisation.Rating)
                 .ClickSubmit()
@@ -73,10 +61,10 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
 
             Log.Information("Отделу {Department} оставлен отзыв {Rating} звезда", department, settings.Organisation.Rating);
         }
-        catch (Exception ex) when(ex is WebDriverException or ObjectDisposedException)
+        catch (Exception ex) when (ex is WebDriverException or ObjectDisposedException)
         {
-            SafeDriverQuit(driver);
-            driver = GetDriver();
+            await SafeContextCloseAsync(context);
+            context = await CreateContextAsync(browser);
             const string error = "Драйвер выкинул ошибку, произведена перезагрузка";
             errorsList.Add(error);
             Log.Warning(error);
@@ -88,8 +76,36 @@ Parallel.ForEach(settings.Organisation.DepartmentsList, parallelOptions, departm
             Log.Error(e, error);
         }
     }
-    SafeDriverQuit(driver);
+
+    await SafeContextCloseAsync(context);
 });
 
 Console.WriteLine($"Скрипт завершился {(errorsList.Count == 0 ? "без ошибок" : $"c {errorsList.Count} ошибками")}");
 Console.WriteLine(settings.Organisation.DepartmentsList.Select(d => $"Отделу {d} проставлено {passedCount[d]} отзывов").Join(Environment.NewLine));
+return;
+
+static async Task<IBrowserContext> CreateContextAsync(IBrowser browser)
+{
+    await Task.Delay(Random.Shared.Next(1000, 5000));
+
+    return await browser.NewContextAsync(new BrowserNewContextOptions
+    {
+        ViewportSize = new ViewportSize
+        {
+            Width = 1920,
+            Height = 1080
+        }
+    });
+}
+
+static async Task SafeContextCloseAsync(IBrowserContext context)
+{
+    try
+    {
+        await context.CloseAsync();
+    }
+    catch (Exception)
+    {
+        // ignored
+    }
+}

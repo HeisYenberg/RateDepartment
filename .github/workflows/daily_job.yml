@@ -18,11 +18,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0'
+          
+      - name: Build
+        run: dotnet build
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
+      - name: Install Playwright browsers
+        run: pwsh RateDepartment/bin/Debug/net8.0/playwright.ps1 install chromium
 
       - name: Run an application
         env:
@@ -36,7 +37,6 @@ jobs:
           Timeouts__Max: ${{ vars.TIMEOUTS_MAX }}
 
         run: |
-          dotnet build
           cd RateDepartment
           dotnet run --no-build 2>&1 | tee output.tmp
           echo "SUMMARY_CONTENT<<EOF" >> $GITHUB_ENV

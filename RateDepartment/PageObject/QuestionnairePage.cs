@@ -1,60 +1,64 @@
+using Microsoft.Playwright;
 using RateDepartment.Extensions;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 namespace RateDepartment.PageObject;
 
-public class QuestionnairePage(WebDriver driver) : BasePage(driver)
+public class QuestionnairePage(IPage page) : BasePage(page)
 {
-    private readonly By _organisationOption = By.Id("id_lpu_id");
+    public ILocator OrganisationOption => Page.Locator("#id_lpu_id");
 
-    private readonly By _departmentOption = By.Id("id_department_id");
+    public ILocator DepartmentOption => Page.Locator("#id_department_id");
 
-    private readonly By _starRatings = By.CssSelector("*[class*='gl-star-rating--stars']");
+    public ILocator StarRatings => Page.Locator("*[class*='gl-star-rating--stars']");
 
-    private readonly string _lStarRaiting = "span[data-value='{0}']";
+    public ILocator SubmitButton => Page.Locator("#submit");
 
-    private readonly By _submitButton = By.Id("submit");
+    public ILocator OkButton => Page.Locator("#okButton");
+}
 
-    private readonly By _okButton = By.Id("okButton");
+public static class QuestionnairePageExtension
+{
+    private const string StarRatingSelector = "span[data-value='{0}']";
 
-    public QuestionnairePage SelectOrganisation(string organisation)
+    public static async Task<QuestionnairePage> SelectOrganisation(this Task<QuestionnairePage> pageTask, string organisation)
     {
-        var selectElement = new SelectElement(Driver.FindElement(_organisationOption));
-        selectElement.SelectByText(organisation);
-
-        return this;
+        var page = await pageTask;
+        await page.OrganisationOption.SelectOptionAsync(new SelectOptionValue { Label = organisation });
+        return page;
     }
 
-    public QuestionnairePage SelectDepartment(string department)
+    public static async Task<QuestionnairePage> SelectDepartment(this Task<QuestionnairePage> pageTask, string department)
     {
-        var selectElement = new SelectElement(Driver.FindElement(_departmentOption));
-        selectElement.SelectByText(department);
-
-        return this;
+        var page = await pageTask;
+        await page.DepartmentOption
+            .SelectOptionAsync(new SelectOptionValue { Label = department });
+        return page;
     }
 
-    public QuestionnairePage SelectStarRating(string rating)
+    public static async Task<QuestionnairePage> SelectStarRating(this Task<QuestionnairePage> pageTask, string rating)
     {
-        foreach (var element in Driver.FindElements(_starRatings))
+        var page = await pageTask;
+        foreach (var element in await page.StarRatings.AllAsync())
         {
-            element.FindElement(By.CssSelector(_lStarRaiting.Format(rating))).Click();
+            await element
+                .Locator(StarRatingSelector.Format(rating))
+                .ClickAsync();
         }
 
-        return this;
+        return page;
     }
 
-    public QuestionnairePage ClickSubmit()
+    public static async Task<QuestionnairePage> ClickSubmit(this Task<QuestionnairePage> pageTask)
     {
-        Driver.WaitAndClick(_submitButton);
-
-        return this;
+        var page = await pageTask;
+        await page.SubmitButton.ClickAsync();
+        return page;
     }
 
-    public QuestionnairePage ClickOk()
+    public static async Task<QuestionnairePage> ClickOk(this Task<QuestionnairePage> pageTask)
     {
-        Driver.WaitAndClick(_okButton);
-
-        return this;
+        var page = await pageTask;
+        await page.OkButton.ClickAsync();
+        return page;
     }
 }
