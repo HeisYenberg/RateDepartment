@@ -19,10 +19,8 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
+      - name: Install Playwright browsers
+        run: pwsh RateDepartment/bin/Debug/net8.0/playwright.ps1 install chromium
 
       - name: Run an application
         env:
