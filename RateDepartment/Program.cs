@@ -29,7 +29,7 @@ var passedCount = settings.Organisation.DepartmentsList.ToDictionary(d => d, _ =
 using var playwright = await Playwright.CreateAsync();
 await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
 {
-    Headless = false,
+    Headless = true,
     Args =
     [
         "--no-sandbox",
